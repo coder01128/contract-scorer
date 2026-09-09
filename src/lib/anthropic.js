@@ -32,7 +32,7 @@ function getClient() {
   })
 }
 
-export async function pdfToImages(file) {
+export async function pdfToImages(file, onPage) {
   const arrayBuffer = await file.arrayBuffer()
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
   const images = []
@@ -45,7 +45,9 @@ export async function pdfToImages(file) {
     canvas.height = viewport.height
     const ctx = canvas.getContext('2d')
     await page.render({ canvasContext: ctx, viewport }).promise
-    images.push(canvas.toDataURL('image/png'))
+    const dataUrl = canvas.toDataURL('image/png')
+    images.push(dataUrl)
+    if (onPage) onPage(dataUrl, i, pdf.numPages)
   }
 
   return images

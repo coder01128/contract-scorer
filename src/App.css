@@ -1009,3 +1009,334 @@ body {
 .mt-16 {
   margin-top: 16px;
 }
+
+/* ===== Demo link ===== */
+.demo-link-wrap {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.demo-link {
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.15s;
+}
+
+.demo-link:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+/* ===== Demo modal (wider) ===== */
+.upload-modal--wide {
+  max-width: 780px;
+}
+
+.upload-modal--wide .upload-body {
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+/* ===== Demo extraction ===== */
+.demo-extraction {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===== Demo card ===== */
+.demo-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: border-color 0.4s;
+}
+
+.demo-card--done {
+  border-color: var(--color-score-strong);
+  background: linear-gradient(to bottom, rgba(22, 163, 74, 0.02), transparent);
+}
+
+.demo-card--error {
+  border-color: var(--color-error);
+}
+
+.demo-card--waiting {
+  opacity: 0.45;
+  background: var(--color-bg);
+}
+
+.demo-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.demo-card-number {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.demo-card-filename {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  word-break: break-all;
+}
+
+.demo-card-body-waiting {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* ===== Demo step tracker ===== */
+.demo-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.demo-step {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.demo-step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.demo-step--pending .demo-step-dot {
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  color: transparent;
+}
+
+.demo-step--active .demo-step-dot {
+  background: var(--color-info-bg);
+  border: 2px solid var(--color-info);
+  color: var(--color-info);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.demo-step--done .demo-step-dot {
+  background: var(--color-score-strong);
+  border: 2px solid var(--color-score-strong);
+  color: #fff;
+}
+
+.demo-step--error .demo-step-dot {
+  background: var(--color-error-bg);
+  border: 2px solid var(--color-error);
+  color: var(--color-error);
+}
+
+.demo-step-text {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.demo-step--active .demo-step-text {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.demo-step--done .demo-step-text {
+  color: var(--color-text-secondary);
+}
+
+.demo-step-line {
+  width: 20px;
+  height: 2px;
+  background: var(--color-border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.demo-step--done + .demo-step .demo-step-line,
+.demo-step--done .demo-step-line {
+  background: var(--color-score-strong);
+}
+
+/* ===== Demo card content ===== */
+.demo-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ===== Page thumbnails ===== */
+.demo-pages-label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.demo-pages-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.demo-page-thumb {
+  width: 80px;
+  height: auto;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  animation: thumbPop 0.3s ease-out both;
+}
+
+@keyframes thumbPop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== Extracted fields ===== */
+.demo-fields-label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.demo-fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.demo-field {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--color-border-light);
+  animation: fieldSlide 0.25s ease-out both;
+}
+
+.demo-field:nth-child(odd) {
+  border-right: 1px solid var(--color-border-light);
+}
+
+.demo-field-key {
+  display: block;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
+.demo-field-val {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+
+@keyframes fieldSlide {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Score reveal ===== */
+.demo-score-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0 2px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.demo-score-num {
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  min-width: 56px;
+  text-align: right;
+}
+
+.demo-score-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-score-verdict {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.demo-score-tag {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+/* ===== Demo responsive ===== */
+@media (max-width: 600px) {
+  .upload-modal--wide {
+    max-width: 100%;
+  }
+
+  .demo-steps {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .demo-step-line {
+    display: none;
+  }
+
+  .demo-fields-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .demo-field:nth-child(odd) {
+    border-right: none;
+  }
+
+  .demo-score-num {
+    font-size: 36px;
+  }
+}
