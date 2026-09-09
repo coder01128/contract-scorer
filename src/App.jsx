@@ -6,12 +6,15 @@ import ContractDetail from './components/contract/ContractDetail'
 import UploadFlow from './components/upload/UploadFlow'
 import HowItWorks from './components/dashboard/HowItWorks'
 
+const INTRO_SEEN_KEY = 'hasSeenIntro'
+
 function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
   const [view, setView] = useState('dashboard')
   const [selectedContract, setSelectedContract] = useState(null)
   const [showUpload, setShowUpload] = useState(false)
+  const [showHowItWorks, setShowHowItWorks] = useState(false)
   const [dealership, setDealership] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
@@ -31,6 +34,7 @@ function App() {
         setDealership(null)
         setView('dashboard')
         setSelectedContract(null)
+        setShowHowItWorks(false)
       }
     })
 
@@ -49,7 +53,18 @@ function App() {
           setDealership({ id: data.dealership_id, name: data.dealerships.name })
         }
       })
+
+    try {
+      if (!localStorage.getItem(INTRO_SEEN_KEY)) {
+        setShowHowItWorks(true)
+      }
+    } catch {}
   }, [session])
+
+  const dismissIntro = useCallback(() => {
+    setShowHowItWorks(false)
+    try { localStorage.setItem(INTRO_SEEN_KEY, '1') } catch {}
+  }, [])
 
   const handleSelectContract = useCallback((contract) => {
     setSelectedContract(contract)
@@ -88,7 +103,8 @@ function App() {
           <pre style={{ background: '#f1f5f9', padding: 16, borderRadius: 8, fontSize: 13, lineHeight: 1.8, overflow: 'auto' }}>
 {`VITE_SUPABASE_URL=your_url
 VITE_SUPABASE_ANON_KEY=your_key
-VITE_ANTHROPIC_API_KEY=your_key`}
+VITE_ANTHROPIC_API_KEY=your_key
+VITE_DEMO_PASSWORD=your_demo_password`}
           </pre>
         </div>
       </div>
@@ -105,7 +121,7 @@ VITE_ANTHROPIC_API_KEY=your_key`}
           {dealership && <span className="dealership-name">{dealership.name}</span>}
         </div>
         <div className="header-right">
-          <button onClick={() => setView('howItWorks')} className="btn btn-ghost">
+          <button onClick={() => setShowHowItWorks(true)} className="btn btn-ghost">
             How it Works
           </button>
           <button onClick={() => setShowUpload(true)} className="btn btn-primary">
@@ -122,10 +138,7 @@ VITE_ANTHROPIC_API_KEY=your_key`}
           <Dashboard
             key={refreshKey}
             onSelectContract={handleSelectContract}
-            onUpload={() => setShowUpload(true)}
           />
-        ) : view === 'howItWorks' ? (
-          <HowItWorks onTryIt={() => setShowUpload(true)} />
         ) : (
           <ContractDetail
             contract={selectedContract}
@@ -133,6 +146,13 @@ VITE_ANTHROPIC_API_KEY=your_key`}
           />
         )}
       </main>
+
+      {showHowItWorks && (
+        <HowItWorks
+          onClose={dismissIntro}
+          onTryIt={() => setShowUpload(true)}
+        />
+      )}
 
       {showUpload && dealership && (
         <UploadFlow

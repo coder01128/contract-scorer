@@ -22,9 +22,10 @@ Identical everywhere — `.env.local`, `.env.example`, Vercel dashboard, and eve
 VITE_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY
 VITE_ANTHROPIC_API_KEY
+VITE_DEMO_PASSWORD
 ```
 
-No other names. Grep the repo to verify before shipping.
+`VITE_DEMO_PASSWORD` is the password for the `demo@riverside.test` Supabase auth account. Used by the "View Demo" button on the login page. No other names. Grep the repo to verify before shipping.
 
 ---
 
@@ -89,6 +90,10 @@ src/
   App.jsx
   main.jsx
 ```
+
+## Model
+
+The extraction API uses `claude-sonnet-5` (model ID: `claude-sonnet-5`). Do not use dated model strings like `claude-sonnet-4-20250514` — they return 404.
 
 ## Key implementation notes
 

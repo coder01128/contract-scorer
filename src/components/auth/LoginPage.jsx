@@ -1,11 +1,15 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 
+const DEMO_EMAIL = 'demo@riverside.test'
+const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD
+
 export default function LoginPage() {
   const [isSignup, setIsSignup] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [demoLoading, setDemoLoading] = useState(false)
   const [error, setError] = useState(null)
   const [signupDone, setSignupDone] = useState(false)
 
@@ -29,12 +33,44 @@ export default function LoginPage() {
     setLoading(false)
   }
 
+  async function handleDemoLogin() {
+    if (!DEMO_PASSWORD) {
+      setError('Demo password not configured. Set VITE_DEMO_PASSWORD in .env.local.')
+      return
+    }
+    setDemoLoading(true)
+    setError(null)
+    const { error } = await supabase.auth.signInWithPassword({
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD,
+    })
+    if (error) setError('Demo login failed: ' + error.message)
+    setDemoLoading(false)
+  }
+
   return (
     <div className="login-page">
       <div className="login-card">
         <div className="login-header">
           <h1>Contract Scorer</h1>
           <p>AI-powered contract analysis for dealerships</p>
+        </div>
+
+        <button
+          className="btn btn-primary btn-full btn-lg demo-login-btn"
+          onClick={handleDemoLogin}
+          disabled={demoLoading || loading}
+        >
+          {demoLoading ? (
+            <><span className="spinner" /> Signing in...</>
+          ) : (
+            'View Demo'
+          )}
+        </button>
+        <p className="demo-login-sub">Instant access with sample data</p>
+
+        <div className="login-divider">
+          <span>or sign in with your account</span>
         </div>
 
         {signupDone ? (
@@ -51,8 +87,8 @@ export default function LoginPage() {
           </div>
         ) : (
           <>
+            {error && <div className="error-message">{error}</div>}
             <form onSubmit={handleSubmit}>
-              {error && <div className="error-message">{error}</div>}
               <div className="form-group">
                 <label htmlFor="email">Email</label>
                 <input
@@ -61,7 +97,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="demo@riverside.test"
+                  placeholder="you@dealership.com"
                 />
               </div>
               <div className="form-group">
@@ -75,7 +111,7 @@ export default function LoginPage() {
                   minLength={6}
                 />
               </div>
-              <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
+              <button type="submit" className="btn btn-outline btn-full" disabled={loading || demoLoading}>
                 {loading ? (
                   <><span className="spinner" /> {isSignup ? 'Creating account...' : 'Signing in...'}</>
                 ) : (
@@ -94,10 +130,6 @@ export default function LoginPage() {
             </p>
           </>
         )}
-
-        <p style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: 'var(--color-text-muted)' }}>
-          Demo: demo@riverside.test
-        </p>
       </div>
     </div>
   )
