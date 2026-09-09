@@ -125,6 +125,15 @@ create policy "Users update dealership contracts"
     )
   );
 
+create policy "Users delete dealership contracts"
+  on contracts for delete
+  using (
+    dealership_id in (
+      select dealership_id from dealership_users
+      where user_id = auth.uid()
+    )
+  );
+
 -- ============================================================
 -- RPC: Get dashboard summary for the user's dealership
 -- ============================================================
@@ -185,6 +194,17 @@ create policy "Users read own dealership files"
 create policy "Users upload to own dealership"
   on storage.objects for insert
   with check (
+    bucket_id = 'contracts'
+    and auth.role() = 'authenticated'
+    and (storage.foldername(name))[1] in (
+      select dealership_id::text from dealership_users
+      where user_id = auth.uid()
+    )
+  );
+
+create policy "Users delete own dealership files"
+  on storage.objects for delete
+  using (
     bucket_id = 'contracts'
     and auth.role() = 'authenticated'
     and (storage.foldername(name))[1] in (

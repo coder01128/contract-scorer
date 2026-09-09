@@ -144,11 +144,28 @@ export default function UploadFlow({ dealership, userId, onClose, onComplete }) 
     if (file) processFile(file)
   }
 
+  async function cleanupExistingDemoContracts() {
+    const sampleNames = SAMPLE_FILES.map(s => s.name)
+    const { data: existing } = await supabase
+      .from('contracts')
+      .select('id, file_path')
+      .in('file_name', sampleNames)
+    if (!existing || existing.length === 0) return
+    for (const contract of existing) {
+      await supabase.storage.from('contracts').remove([contract.file_path])
+      await supabase.from('contracts').delete().eq('id', contract.id)
+    }
+  }
+
   async function startDemo() {
     setMode('demo')
     const contracts = SAMPLE_FILES.map(s => makeDemoContract(s.name))
     setDemoContracts(contracts)
     setDemoComplete(false)
+
+    try {
+      await cleanupExistingDemoContracts()
+    } catch {}
 
     for (let i = 0; i < SAMPLE_FILES.length; i++) {
       try {

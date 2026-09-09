@@ -73,7 +73,8 @@ export async function extractContractData(pageImages) {
     messages: [{ role: 'user', content }],
   })
 
-  const text = response.content[0].text
-  const cleaned = text.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim()
+  const textBlock = response.content.find(block => block.type === 'text')
+  if (!textBlock?.text) throw new Error('No text in extraction response')
+  const cleaned = textBlock.text.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim()
   return JSON.parse(cleaned)
 }
