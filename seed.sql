@@ -16,7 +16,7 @@ insert into dealerships (id, name) values
 -- Step 2: Link the demo user to the dealership
 -- REPLACE this UUID with the actual auth.users.id from the Supabase Auth dashboard
 insert into dealership_users (user_id, dealership_id, role) values
-  ('REPLACE_WITH_AUTH_USER_UUID', 'd0000000-0000-0000-0000-000000000001', 'owner');
+  ('d2ac8d48-180c-495b-9dbc-543bca954a90', 'd0000000-0000-0000-0000-000000000001', 'owner');
 
 -- Step 3: Seed scored contracts across the score range
 
@@ -31,7 +31,7 @@ insert into contracts (
 ) values (
   'c0000000-0000-0000-0000-000000000001',
   'd0000000-0000-0000-0000-000000000001',
-  'REPLACE_WITH_AUTH_USER_UUID',
+  'd2ac8d48-180c-495b-9dbc-543bca954a90',
   'd0000000-0000-0000-0000-000000000001/c0000000-0000-0000-0000-000000000001/vinsolutions-crm.pdf',
   'vinsolutions-crm.pdf',
   'scored',
@@ -55,7 +55,7 @@ insert into contracts (
 ) values (
   'c0000000-0000-0000-0000-000000000002',
   'd0000000-0000-0000-0000-000000000001',
-  'REPLACE_WITH_AUTH_USER_UUID',
+  'd2ac8d48-180c-495b-9dbc-543bca954a90',
   'd0000000-0000-0000-0000-000000000001/c0000000-0000-0000-0000-000000000002/reynolds-dms.pdf',
   'reynolds-dms.pdf',
   'scored',
@@ -79,7 +79,7 @@ insert into contracts (
 ) values (
   'c0000000-0000-0000-0000-000000000003',
   'd0000000-0000-0000-0000-000000000001',
-  'REPLACE_WITH_AUTH_USER_UUID',
+  'd2ac8d48-180c-495b-9dbc-543bca954a90',
   'd0000000-0000-0000-0000-000000000001/c0000000-0000-0000-0000-000000000003/dealer-fi-warranty.pdf',
   'dealer-fi-warranty.pdf',
   'scored',
@@ -98,7 +98,7 @@ insert into contracts (
 ) values (
   'c0000000-0000-0000-0000-000000000004',
   'd0000000-0000-0000-0000-000000000001',
-  'REPLACE_WITH_AUTH_USER_UUID',
+  'd2ac8d48-180c-495b-9dbc-543bca954a90',
   'd0000000-0000-0000-0000-000000000001/c0000000-0000-0000-0000-000000000004/pending-review.pdf',
   'pending-review.pdf',
   'pending'
