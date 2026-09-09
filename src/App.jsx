@@ -4,6 +4,7 @@ import LoginPage from './components/auth/LoginPage'
 import Dashboard from './components/dashboard/Dashboard'
 import ContractDetail from './components/contract/ContractDetail'
 import UploadFlow from './components/upload/UploadFlow'
+import HowItWorks from './components/dashboard/HowItWorks'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -104,6 +105,9 @@ VITE_ANTHROPIC_API_KEY=your_key`}
           {dealership && <span className="dealership-name">{dealership.name}</span>}
         </div>
         <div className="header-right">
+          <button onClick={() => setView('howItWorks')} className="btn btn-ghost">
+            How it Works
+          </button>
           <button onClick={() => setShowUpload(true)} className="btn btn-primary">
             Upload Contract
           </button>
@@ -118,7 +122,10 @@ VITE_ANTHROPIC_API_KEY=your_key`}
           <Dashboard
             key={refreshKey}
             onSelectContract={handleSelectContract}
+            onUpload={() => setShowUpload(true)}
           />
+        ) : view === 'howItWorks' ? (
+          <HowItWorks onTryIt={() => setShowUpload(true)} />
         ) : (
           <ContractDetail
             contract={selectedContract}

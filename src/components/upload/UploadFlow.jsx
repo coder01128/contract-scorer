@@ -76,6 +76,18 @@ export default function UploadFlow({ dealership, userId, onClose, onComplete }) 
     return 'pending'
   }
 
+  async function getVerifiedAuth() {
+    const { data: { user }, error: authErr } = await supabase.auth.getUser()
+    if (authErr || !user) throw new Error('Session expired. Please sign in again.')
+    const { data: membership, error: memErr } = await supabase
+      .from('dealership_users')
+      .select('dealership_id')
+      .eq('user_id', user.id)
+      .single()
+    if (memErr || !membership) throw new Error('No dealership linked to your account.')
+    return { verifiedUserId: user.id, verifiedDealershipId: membership.dealership_id }
+  }
+
   async function processFile(file) {
     if (!file) return
     if (!file.name.toLowerCase().endsWith('.pdf')) {
@@ -86,11 +98,12 @@ export default function UploadFlow({ dealership, userId, onClose, onComplete }) 
     setFileName(file.name)
     setError(null)
     const contractId = crypto.randomUUID()
-    const filePath = `${dealership.id}/${contractId}/${file.name}`
 
     try {
       setStep('upload')
-      const { error: ie } = await supabase.from('contracts').insert({ id: contractId, dealership_id: dealership.id, uploaded_by: userId, file_path: filePath, file_name: file.name, status: 'pending' })
+      const { verifiedUserId, verifiedDealershipId } = await getVerifiedAuth()
+      const filePath = `${verifiedDealershipId}/${contractId}/${file.name}`
+      const { error: ie } = await supabase.from('contracts').insert({ id: contractId, dealership_id: verifiedDealershipId, uploaded_by: verifiedUserId, file_path: filePath, file_name: file.name, status: 'pending' })
       if (ie) throw new Error('Database insert failed: ' + ie.message)
       const { error: ue } = await supabase.storage.from('contracts').upload(filePath, file)
       if (ue) throw new Error('File upload failed: ' + ue.message)
@@ -158,9 +171,10 @@ export default function UploadFlow({ dealership, userId, onClose, onComplete }) 
     const file = new File([blob], sample.name, { type: 'application/pdf' })
 
     const contractId = crypto.randomUUID()
-    const filePath = `${dealership.id}/${contractId}/${file.name}`
+    const { verifiedUserId, verifiedDealershipId } = await getVerifiedAuth()
+    const filePath = `${verifiedDealershipId}/${contractId}/${file.name}`
 
-    const { error: ie } = await supabase.from('contracts').insert({ id: contractId, dealership_id: dealership.id, uploaded_by: userId, file_path: filePath, file_name: file.name, status: 'pending' })
+    const { error: ie } = await supabase.from('contracts').insert({ id: contractId, dealership_id: verifiedDealershipId, uploaded_by: verifiedUserId, file_path: filePath, file_name: file.name, status: 'pending' })
     if (ie) throw new Error('Database insert failed: ' + ie.message)
     const { error: ue } = await supabase.storage.from('contracts').upload(filePath, file)
     if (ue) throw new Error('File upload failed: ' + ue.message)
@@ -246,9 +260,9 @@ export default function UploadFlow({ dealership, userId, onClose, onComplete }) 
                 <p>or click to browse &middot; PDF files only</p>
               </div>
               <input ref={fileRef} type="file" accept=".pdf" onChange={handleFileSelect} style={{ display: 'none' }} />
-              <div className="demo-link-wrap">
-                <button className="demo-link" onClick={startDemo}>Or try with sample contracts</button>
-              </div>
+              <button className="btn demo-btn" onClick={startDemo}>
+                Run Demo &mdash; Process Sample Contracts
+              </button>
             </>
           )}
 

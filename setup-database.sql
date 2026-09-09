@@ -165,11 +165,33 @@ as $$
 $$;
 
 -- ============================================================
--- Storage bucket
+-- Storage bucket + policies
 -- ============================================================
 -- Create manually in Supabase dashboard: bucket name "contracts", private
 -- File path convention: {dealership_id}/{contract_id}/{filename}
--- RLS on storage managed via Supabase dashboard storage policies
+-- Then run these policies in the SQL Editor:
+
+create policy "Users read own dealership files"
+  on storage.objects for select
+  using (
+    bucket_id = 'contracts'
+    and auth.role() = 'authenticated'
+    and (storage.foldername(name))[1] in (
+      select dealership_id::text from dealership_users
+      where user_id = auth.uid()
+    )
+  );
+
+create policy "Users upload to own dealership"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'contracts'
+    and auth.role() = 'authenticated'
+    and (storage.foldername(name))[1] in (
+      select dealership_id::text from dealership_users
+      where user_id = auth.uid()
+    )
+  );
 
 -- ============================================================
 -- Updated_at trigger

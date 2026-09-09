@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
 import { getScoreColor, getScoreLabel } from '../../lib/scoring'
+import HowItWorks from './HowItWorks'
 
 function ScoreBadge({ score }) {
   if (score == null) return null
@@ -37,7 +38,7 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-export default function Dashboard({ onSelectContract }) {
+export default function Dashboard({ onSelectContract, onUpload }) {
   const [contracts, setContracts] = useState([])
   const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -119,6 +120,10 @@ export default function Dashboard({ onSelectContract }) {
     )
   }
 
+  if (contracts.length === 0) {
+    return <HowItWorks onTryIt={onUpload} />
+  }
+
   const scoredCount = summary?.total_contracts ?? 0
 
   function SortArrow({ field }) {
@@ -182,13 +187,7 @@ export default function Dashboard({ onSelectContract }) {
           <span className="text-muted text-sm">{contracts.length} total</span>
         </div>
 
-        {contracts.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-state-icon">&#128196;</div>
-            <h3>No contracts yet</h3>
-            <p>Upload your first vendor contract to get an AI-powered deal score and negotiation recommendations.</p>
-          </div>
-        ) : (
+        {contracts.length > 0 && (
           <div style={{ overflowX: 'auto' }}>
             <table className="contract-table">
               <thead>
