@@ -145,16 +145,22 @@ export default function UploadFlow({ dealership, userId, onClose, onComplete }) 
   }
 
   async function cleanupExistingDemoContracts() {
+    console.log('[Demo] Cleanup: checking for existing sample contracts...')
     const sampleNames = SAMPLE_FILES.map(s => s.name)
     const { data: existing } = await supabase
       .from('contracts')
       .select('id, file_path')
       .in('file_name', sampleNames)
-    if (!existing || existing.length === 0) return
+    if (!existing || existing.length === 0) {
+      console.log('[Demo] Cleanup: no existing samples found')
+      return
+    }
+    console.log(`[Demo] Cleanup: deleting ${existing.length} existing sample(s)`)
     for (const contract of existing) {
       await supabase.storage.from('contracts').remove([contract.file_path])
       await supabase.from('contracts').delete().eq('id', contract.id)
     }
+    console.log('[Demo] Cleanup: done')
   }
 
   async function startDemo() {
