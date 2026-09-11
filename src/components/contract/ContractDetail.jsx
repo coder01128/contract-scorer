@@ -85,7 +85,7 @@ export default function ContractDetail({ contract, onBack }) {
     }
     return (
       <div>
-        <button className="detail-back" onClick={onBack}>&#8592; Back to Dashboard</button>
+        <button className="detail-back" onClick={onBack}>&#8592; Back</button>
         <div className="detail-section" style={{ padding: 40, textAlign: 'center' }}>
           <div style={{ fontSize: 48, marginBottom: 16, opacity: 0.3 }}>
             {c.status === 'failed' ? '⚠' : '📄'}
@@ -110,7 +110,7 @@ export default function ContractDetail({ contract, onBack }) {
 
   return (
     <div>
-      <button className="detail-back" onClick={onBack}>&#8592; Back to Dashboard</button>
+      <button className="detail-back" onClick={onBack}>&#8592; Back</button>
 
       <div className="detail-header-row">
         <div className="detail-title">
@@ -129,6 +129,14 @@ export default function ContractDetail({ contract, onBack }) {
           <div className="deal-score-sublabel">Deal Score</div>
         </div>
       </div>
+
+      <button className="btn btn-outline btn-view-doc" onClick={handleDownload}>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M11 2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6l-4-4z" />
+          <path d="M11 2v4h4" /><line x1="6" y1="10" x2="12" y2="10" /><line x1="6" y1="14" x2="12" y2="14" />
+        </svg>
+        View Original Document
+      </button>
 
       <div className="score-gauges">
         <ScoreGauge score={c.score_pricing} label="Pricing" weight={40} />
@@ -252,9 +260,6 @@ export default function ContractDetail({ contract, onBack }) {
         </div>
       </div>
 
-      <button className="btn btn-outline" onClick={handleDownload}>
-        &#128196; View Original Document
-      </button>
     </div>
   )
 }

@@ -3,21 +3,17 @@ import { supabase, isMissingConfig } from './lib/supabase'
 import LoginPage from './components/auth/LoginPage'
 import Dashboard from './components/dashboard/Dashboard'
 import ContractDetail from './components/contract/ContractDetail'
+import ContractsPage from './components/contracts/ContractsPage'
+import AnalyticsPage from './components/analytics/AnalyticsPage'
+import VendorsPage from './components/vendors/VendorsPage'
+import ReportsPage from './components/reports/ReportsPage'
+import SettingsPage from './components/settings/SettingsPage'
 import UploadFlow from './components/upload/UploadFlow'
 import HowItWorks from './components/dashboard/HowItWorks'
 import Sidebar from './components/layout/Sidebar'
 import TopBar from './components/layout/TopBar'
 
 const INTRO_SEEN_KEY = 'hasSeenIntro'
-
-function PlaceholderPage({ title }) {
-  return (
-    <div className="placeholder-page">
-      <h1>{title}</h1>
-      <p>This section is coming soon.</p>
-    </div>
-  )
-}
 
 function App() {
   const [session, setSession] = useState(null)
@@ -28,6 +24,12 @@ function App() {
   const [showHowItWorks, setShowHowItWorks] = useState(false)
   const [dealership, setDealership] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [vendorFilter, setVendorFilter] = useState('')
+
+  const [contracts, setContracts] = useState([])
+  const [summary, setSummary] = useState(null)
+  const [dataLoading, setDataLoading] = useState(true)
+  const [dataError, setDataError] = useState(null)
 
   useEffect(() => {
     if (isMissingConfig) {
@@ -46,6 +48,8 @@ function App() {
         setCurrentPage('dashboard')
         setSelectedContract(null)
         setShowHowItWorks(false)
+        setContracts([])
+        setSummary(null)
       }
     })
 
@@ -68,6 +72,28 @@ function App() {
     } catch {}
   }, [session])
 
+  const loadData = useCallback(async () => {
+    setDataLoading(true)
+    setDataError(null)
+    try {
+      const [contractsRes, summaryRes] = await Promise.all([
+        supabase.from('contracts').select('*').order('created_at', { ascending: false }),
+        supabase.rpc('get_dashboard_summary'),
+      ])
+      if (contractsRes.error) throw contractsRes.error
+      setContracts(contractsRes.data || [])
+      if (!summaryRes.error && summaryRes.data?.[0]) setSummary(summaryRes.data[0])
+    } catch (err) {
+      setDataError(err.message)
+    } finally {
+      setDataLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (session) loadData()
+  }, [session, refreshKey, loadData])
+
   const dismissIntro = useCallback(() => {
     setShowHowItWorks(false)
     try { localStorage.setItem(INTRO_SEEN_KEY, '1') } catch {}
@@ -84,11 +110,17 @@ function App() {
   const handleNavigate = useCallback((page) => {
     setCurrentPage(page)
     setSelectedContract(null)
+    if (page !== 'contracts') setVendorFilter('')
   }, [])
 
   const handleUploadComplete = useCallback(() => {
     setShowUpload(false)
     setRefreshKey(k => k + 1)
+  }, [])
+
+  const handleSelectVendor = useCallback((vendorName) => {
+    setVendorFilter(vendorName)
+    setCurrentPage('contracts')
   }, [])
 
   if (loading) {
@@ -125,19 +157,48 @@ VITE_DEMO_PASSWORD=your_demo_password`}
     }
     switch (currentPage) {
       case 'dashboard':
-        return <Dashboard key={refreshKey} onSelectContract={handleSelectContract} />
+        return (
+          <Dashboard
+            contracts={contracts}
+            summary={summary}
+            loading={dataLoading}
+            error={dataError}
+            onSelectContract={handleSelectContract}
+            onUpload={() => setShowUpload(true)}
+            onRetry={loadData}
+          />
+        )
       case 'contracts':
-        return <Dashboard key={`contracts-${refreshKey}`} onSelectContract={handleSelectContract} />
+        return (
+          <ContractsPage
+            contracts={contracts}
+            loading={dataLoading}
+            onSelectContract={handleSelectContract}
+            onUpload={() => setShowUpload(true)}
+            initialVendorFilter={vendorFilter}
+            onClearVendorFilter={() => setVendorFilter('')}
+          />
+        )
       case 'analytics':
-        return <PlaceholderPage title="Analytics" />
+        return <AnalyticsPage contracts={contracts} loading={dataLoading} />
       case 'vendors':
-        return <PlaceholderPage title="Vendors" />
+        return <VendorsPage contracts={contracts} loading={dataLoading} onSelectVendor={handleSelectVendor} />
       case 'reports':
-        return <PlaceholderPage title="Reports" />
+        return <ReportsPage contracts={contracts} loading={dataLoading} />
       case 'settings':
-        return <PlaceholderPage title="Settings" />
+        return <SettingsPage dealershipName={dealership?.name} />
       default:
-        return <Dashboard key={refreshKey} onSelectContract={handleSelectContract} />
+        return (
+          <Dashboard
+            contracts={contracts}
+            summary={summary}
+            loading={dataLoading}
+            error={dataError}
+            onSelectContract={handleSelectContract}
+            onUpload={() => setShowUpload(true)}
+            onRetry={loadData}
+          />
+        )
     }
   }
 
