@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { getScoreColor, getScoreLabel } from '../../lib/scoring'
 
@@ -47,6 +48,33 @@ function ScoreGauge({ score, label, weight, size = 120 }) {
       </div>
       <span className="gauge-label">{label}</span>
       <span className="gauge-weight">{weight}% of Deal Score</span>
+    </div>
+  )
+}
+
+function AccordionSection({ title, icon, defaultOpen, children }) {
+  const [open, setOpen] = useState(defaultOpen)
+
+  return (
+    <div className="accordion-section">
+      <button className="accordion-header" onClick={() => setOpen(o => !o)}>
+        <div className="accordion-header-left">
+          {icon && <span className="accordion-icon">{icon}</span>}
+          <h3>{title}</h3>
+        </div>
+        <svg
+          width="16" height="16" viewBox="0 0 16 16" fill="none"
+          stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+          className={`accordion-chevron ${open ? 'accordion-chevron--open' : ''}`}
+        >
+          <path d="M4 6l4 4 4-4" />
+        </svg>
+      </button>
+      <div className={`accordion-body ${open ? 'accordion-body--open' : ''}`}>
+        <div className="accordion-content">
+          {children}
+        </div>
+      </div>
     </div>
   )
 }
@@ -112,6 +140,7 @@ export default function ContractDetail({ contract, onBack }) {
     <div>
       <button className="detail-back" onClick={onBack}>&#8592; Back</button>
 
+      {/* 1. Header — always visible */}
       <div className="detail-header-row">
         <div className="detail-title">
           <h2>{c.vendor_name}</h2>
@@ -130,26 +159,40 @@ export default function ContractDetail({ contract, onBack }) {
         </div>
       </div>
 
-      <button className="btn btn-outline btn-view-doc" onClick={handleDownload}>
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      {/* 2. View Original Document — always visible */}
+      <button className="btn-view-doc" onClick={handleDownload}>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M11 2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6l-4-4z" />
           <path d="M11 2v4h4" /><line x1="6" y1="10" x2="12" y2="10" /><line x1="6" y1="14" x2="12" y2="14" />
         </svg>
         View Original Document
       </button>
 
+      {/* 3. Score breakdown — always visible */}
       <div className="score-gauges">
         <ScoreGauge score={c.score_pricing} label="Pricing" weight={40} />
         <ScoreGauge score={c.score_terms} label="Terms" weight={30} />
         <ScoreGauge score={c.score_flexibility} label="Flexibility" weight={30} />
       </div>
 
-      {negotiationPoints.length > 0 && (
-        <div className="negotiation-panel">
-          <div className="negotiation-header">
-            <span style={{ fontSize: 18 }}>&#9888;</span>
-            <h3>Negotiation Opportunities</h3>
-          </div>
+      {/* 4. Key Clauses — collapsible, expanded by default */}
+      {keyClauses.length > 0 && (
+        <AccordionSection title="Key Clauses" icon="§" defaultOpen={true}>
+          <ul className="clause-list">
+            {keyClauses.map((clause, i) => (
+              <li key={i}>{clause}</li>
+            ))}
+          </ul>
+        </AccordionSection>
+      )}
+
+      {/* 5. Negotiation Opportunities — collapsible, expanded by default */}
+      <AccordionSection
+        title="Negotiation Opportunities"
+        icon={negotiationPoints.length > 0 ? '⚠' : '✓'}
+        defaultOpen={true}
+      >
+        {negotiationPoints.length > 0 ? (
           <ul className="negotiation-list">
             {negotiationPoints.map((point, i) => (
               <li key={i} className="negotiation-item">
@@ -158,25 +201,15 @@ export default function ContractDetail({ contract, onBack }) {
               </li>
             ))}
           </ul>
-        </div>
-      )}
-
-      {negotiationPoints.length === 0 && (
-        <div className="negotiation-panel">
-          <div className="negotiation-header">
-            <span style={{ fontSize: 18 }}>&#10003;</span>
-            <h3>Negotiation Opportunities</h3>
-          </div>
+        ) : (
           <div className="no-negotiation-points">
             This contract scores well — no major negotiation points identified.
           </div>
-        </div>
-      )}
+        )}
+      </AccordionSection>
 
-      <div className="detail-section">
-        <div className="detail-section-header">
-          <h3>Extracted Contract Data</h3>
-        </div>
+      {/* 6. Extracted Contract Data — collapsible, collapsed by default */}
+      <AccordionSection title="Extracted Contract Data" icon="📋" defaultOpen={false}>
         <div className="extracted-grid">
           <div className="extracted-item">
             <div className="extracted-item-label">Vendor</div>
@@ -246,20 +279,8 @@ export default function ContractDetail({ contract, onBack }) {
               </ul>
             </div>
           )}
-
-          {keyClauses.length > 0 && (
-            <div className="extracted-item extracted-item--full">
-              <div className="extracted-item-label">Key Clauses</div>
-              <ul className="clause-list">
-                {keyClauses.map((clause, i) => (
-                  <li key={i}>{clause}</li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
-      </div>
-
+      </AccordionSection>
     </div>
   )
 }
