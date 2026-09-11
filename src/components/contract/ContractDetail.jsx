@@ -63,7 +63,7 @@ function AccordionSection({ title, icon, defaultOpen, children }) {
           <h3>{title}</h3>
         </div>
         <svg
-          width="16" height="16" viewBox="0 0 16 16" fill="none"
+          width="18" height="18" viewBox="0 0 16 16" fill="none"
           stroke="currentColor" strokeWidth="2" strokeLinecap="round"
           className={`accordion-chevron ${open ? 'accordion-chevron--open' : ''}`}
         >
@@ -71,8 +71,10 @@ function AccordionSection({ title, icon, defaultOpen, children }) {
         </svg>
       </button>
       <div className={`accordion-body ${open ? 'accordion-body--open' : ''}`}>
-        <div className="accordion-content">
-          {children}
+        <div className="accordion-body-inner">
+          <div className="accordion-content">
+            {children}
+          </div>
         </div>
       </div>
     </div>
