@@ -26,6 +26,8 @@ function App() {
   const [refreshKey, setRefreshKey] = useState(0)
   const [vendorFilter, setVendorFilter] = useState('')
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
   const [contracts, setContracts] = useState([])
   const [summary, setSummary] = useState(null)
   const [dataLoading, setDataLoading] = useState(true)
@@ -110,6 +112,7 @@ function App() {
   const handleNavigate = useCallback((page) => {
     setCurrentPage(page)
     setSelectedContract(null)
+    setMobileMenuOpen(false)
     if (page !== 'contracts') setVendorFilter('')
   }, [])
 
@@ -208,9 +211,11 @@ VITE_DEMO_PASSWORD=your_demo_password`}
         currentPage={currentPage}
         onNavigate={handleNavigate}
         dealershipName={dealership?.name}
+        mobileMenuOpen={mobileMenuOpen}
+        onCloseMobileMenu={() => setMobileMenuOpen(false)}
       />
       <div className="app-content">
-        <TopBar />
+        <TopBar onToggleMobileMenu={() => setMobileMenuOpen(o => !o)} />
         <main className="app-main">
           {renderPage()}
         </main>

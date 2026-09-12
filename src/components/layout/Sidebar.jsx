@@ -64,9 +64,11 @@ const navItems = [
   },
 ]
 
-export default function Sidebar({ currentPage, onNavigate, dealershipName }) {
+export default function Sidebar({ currentPage, onNavigate, dealershipName, mobileMenuOpen, onCloseMobileMenu }) {
   return (
-    <aside className="sidebar">
+    <>
+    {mobileMenuOpen && <div className="sidebar-backdrop" onClick={onCloseMobileMenu} />}
+    <aside className={`sidebar${mobileMenuOpen ? ' sidebar--open' : ''}`}>
       <div className="sidebar-logo">
         <div className="sidebar-logo-icon">
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
@@ -103,5 +105,6 @@ export default function Sidebar({ currentPage, onNavigate, dealershipName }) {
         </div>
       </div>
     </aside>
+    </>
   )
 }
